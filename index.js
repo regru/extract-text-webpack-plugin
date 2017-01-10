@@ -52,6 +52,27 @@ ExtractTextPluginCompilation.prototype.addModule = function(identifier, original
 	return m;
 };
 
+function indexOf( list, module ) {
+	var i = 0,
+		findIndex = -1;
+	while ( list[ i ] ) {
+		// console.log(list[ i ].userRequest , module.getOriginalModule().userRequest)
+		if (list[ i ].userRequest === module.getOriginalModule().userRequest) {
+			findIndex = i;
+			break;
+		}
+		i++;
+	}
+	return findIndex;
+}
+
+function getSortFunc(modules) {
+	return function(a, b) {
+		// console.log(indexOf(modules, a), indexOf(modules, b))
+		return indexOf(modules, a) - indexOf(modules, b);
+	}
+}
+
 ExtractTextPluginCompilation.prototype.addResultToChunk = function(identifier, result, originalModule, extractedChunk) {
 	if(!Array.isArray(result)) {
 		result = [[identifier, result]];
@@ -232,6 +253,7 @@ ExtractTextPlugin.prototype.apply = function(compiler) {
 				var extractedChunk = extractedChunks[i];
 				extractedChunk.index = i;
 				extractedChunk.originalChunk = chunk;
+				extractedChunk.originalModules = chunk.modules.slice();
 				extractedChunk.name = chunk.name;
 				extractedChunk.entrypoints = chunk.entrypoints;
 				chunk.chunks.forEach(function(c) {
@@ -295,12 +317,13 @@ ExtractTextPlugin.prototype.apply = function(compiler) {
 		compilation.plugin("additional-assets", function(callback) {
 			extractedChunks.forEach(function(extractedChunk) {
 				if(extractedChunk.modules.length) {
+					var sortFunc = getSortFunc(extractedChunk.originalModules);
 					extractedChunk.modules.sort(function(a, b) {
 						if(isInvalidOrder(a, b)) {
 							compilation.errors.push(new OrderUndefinedError(a.getOriginalModule()));
 							compilation.errors.push(new OrderUndefinedError(b.getOriginalModule()));
 						}
-						return getOrder(a, b);
+						return sortFunc(a, b);
 					});
 					var chunk = extractedChunk.originalChunk;
 					var source = this.renderExtractedChunk(extractedChunk);
