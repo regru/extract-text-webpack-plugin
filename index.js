@@ -56,7 +56,6 @@ function indexOf( list, module ) {
 	var i = 0,
 		findIndex = -1;
 	while ( list[ i ] ) {
-		// console.log(list[ i ].userRequest , module.getOriginalModule().userRequest)
 		if (list[ i ].userRequest === module.getOriginalModule().userRequest) {
 			findIndex = i;
 			break;
@@ -68,7 +67,6 @@ function indexOf( list, module ) {
 
 function getSortFunc(modules) {
 	return function(a, b) {
-		// console.log(indexOf(modules, a), indexOf(modules, b))
 		return indexOf(modules, a) - indexOf(modules, b);
 	}
 }
