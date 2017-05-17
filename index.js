@@ -70,7 +70,14 @@ function indexOf( list, module ) {
 
 function getSortFunc(modules) {
 	return function(a, b) {
-		return indexOf(modules, a) - indexOf(modules, b);
+		var lftHand = indexOf(modules, a),
+			rgtHand = indexOf(modules, b);
+
+		if ( !(~lftHand && ~rgtHand) ) {
+			return 1;
+		}
+
+		return lftHand - rgtHand;
 	}
 }
 
