@@ -68,16 +68,28 @@ function indexOf( list, module ) {
 	return findIndex;
 }
 
+function isLBlock(block) {
+	return /l-\w+\.less/.test(block);
+}
+
 function getSortFunc(modules) {
 	return function(a, b) {
-		var lftHand = indexOf(modules, a),
-			rgtHand = indexOf(modules, b);
+		var lftHandIndex = indexOf(modules, a),
+			rgtHandIndex = indexOf(modules, b),
+			lftBasename = path.basename(a.getOriginalModule().userRequest),
+			rgtBasename = path.basename(b.getOriginalModule().userRequest),
+			isLftLBlock = isLBlock(lftBasename),
+			isRgtLBlock = isLBlock(rgtBasename);
 
-		if ( !(~lftHand && ~rgtHand) ) {
+		if ( isLftLBlock || isRgtLBlock ) {
+			return !isRgtLBlock;
+		}
+
+		if ( !(~lftHandIndex && ~rgtHandIndex) ) {
 			return 1;
 		}
 
-		return lftHand - rgtHand;
+		return lftHandIndex - rgtHandIndex;
 	}
 }
 
