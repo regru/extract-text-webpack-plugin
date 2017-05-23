@@ -191,6 +191,14 @@ function isString(a) {
 	return typeof a === "string";
 }
 
+function isFunction(a) {
+	return isType('Function', a);
+}
+
+function isType(type, obj) {
+	return Object.prototype.toString.call(obj) === '[object ' + type + ']';
+}
+
 ExtractTextPlugin.loader = function(options) {
 	return { loader: require.resolve("./loader"), options: options };
 };
@@ -309,7 +317,8 @@ ExtractTextPlugin.prototype.apply = function(compiler) {
 									return callback();
 								}
 								meta = module[NS];
-								if(!Array.isArray(meta.content)) {
+								// Error out if content is not an array and is not null
+								if(!Array.isArray(meta.content) && meta.content != null) {
 									err = new Error(module.identifier() + " doesn't export content");
 									compilation.errors.push(err);
 									return callback();
@@ -358,11 +367,15 @@ ExtractTextPlugin.prototype.apply = function(compiler) {
 					});
 					var chunk = extractedChunk.originalChunk;
 					var source = this.renderExtractedChunk(extractedChunk);
-					var file = compilation.getPath(filename, {
+
+					var getPath = (format) => compilation.getPath(format, {
 						chunk: chunk
 					}).replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function() {
 						return loaderUtils.getHashDigest(source.source(), arguments[1], arguments[2], parseInt(arguments[3], 10));
 					});
+
+					var file = (isFunction(filename)) ? filename(getPath) : getPath(filename);
+					
 					compilation.assets[file] = source;
 					chunk.files.push(file);
 				}

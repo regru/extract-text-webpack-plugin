@@ -18,10 +18,10 @@
 <h2 align="center">Install</h2>
 
 ```bash
-# for webpack 1
-npm install --save-dev extract-text-webpack-plugin
 # for webpack 2
-npm install --save-dev extract-text-webpack-plugin@beta
+npm install --save-dev extract-text-webpack-plugin
+# for webpack 1
+npm install --save-dev extract-text-webpack-plugin@1.0.1
 ```
 
 <h2 align="center">Usage</h2>
@@ -49,7 +49,7 @@ module.exports = {
 }
 ```
 
-It moves every `require("style.css")` in entry chunks into a separate CSS file. So your styles are no longer inlined into the JS bundle, but separate in a CSS bundle file (`styles.css`). If your total stylesheet volume is big, it will be faster because the CSS bundle is loaded in parallel to the JS bundle.
+It moves all the required `*.css` modules in entry chunks into a separate CSS file. So your styles are no longer inlined into the JS bundle, but in a separate CSS file (`styles.css`). If your total stylesheet volume is big, it will be faster because the CSS bundle is loaded in parallel to the JS bundle.
 
 |Advantages|Caveats|
 |:---------|:------|
@@ -68,8 +68,8 @@ new ExtractTextPlugin(options: filename | object)
 |Name|Type|Description|
 |:--:|:--:|:----------|
 |**`id`**|`{String}`|Unique ident for this plugin instance. (For advanced usage only, by default automatically generated)|
-|**`filename`**|`{String}`|Name of the result file. May contain `[name]`, `[id]` and `[contenthash]`|
-|**`allChunks`**|`{Boolean}`|Extract from all additional chunks too (by default it extracts only from the initial chunk(s))|
+|**`filename`**|`{String\|Function}`|Name of the result file. May contain `[name]`, `[id]` and `[contenthash]`|
+|**`allChunks`**|`{Boolean}`|Extract from all additional chunks too (by default it extracts only from the initial chunk(s))<br />When using `CommonsChunkPlugin` and there are extracted chunks (from `ExtractTextPlugin.extract`) in the commons chunk, `allChunks` **must** be set to `true`|
 |**`disable`**|`{Boolean}`|Disables the plugin|
 |**`ignoreOrder`**|`{Boolean}`|Disables order check (useful for CSS Modules!), `false` by default|
 
@@ -102,8 +102,8 @@ There is also an `extract` function on the instance. You should use this if you 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 // Create multiple instances
-const extractCSS = new ExtractTextPlugin('stylesheets/[name].css');
-const extractLESS = new ExtractTextPlugin('stylesheets/[name].less');
+const extractCSS = new ExtractTextPlugin('stylesheets/[name]-one.css');
+const extractLESS = new ExtractTextPlugin('stylesheets/[name]-two.css');
 
 module.exports = {
   module: {
@@ -134,7 +134,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   module: {
-    use: [
+    rules: [
       {
         test: /\.scss$/,
         use: ExtractTextPlugin.extract({
@@ -155,17 +155,55 @@ module.exports = {
 }
 ```
 
-<h2 align="center">Maintainer</h2>
+### Modify filename
+
+`filename` parameter could be `Function`. It passes `getPath` to process the format like `css/[name].css` and returns the real file name, `css/js/a.css`. You can replace `css/js` with `css` then you will get the new path `css/a.css`.
+
+
+```js
+entry: {
+  'js/a': "./a"
+},
+plugins: [
+  new ExtractTextPlugin({
+    filename:  (getPath) => {
+      return getPath('css/[name].css').replace('css/js', 'css');
+    },
+    allChunks: true
+  })
+]
+```
+
+<h2 align="center">Maintainers</h2>
 
 <table>
   <tbody>
     <tr>
       <td align="center">
-        <img width="150" height="150" src="https://github.com/sokra.png?s=150">
-        <br>
-        <a href="https://github.com/sokra">Tobias Koppers</a>
+        <img width="150" height="150"
+        src="https://avatars3.githubusercontent.com/u/166921?v=3&s=150">
+        </br>
+        <a href="https://github.com/bebraw">Juho Vepsäläinen</a>
       </td>
-    <tr/>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars2.githubusercontent.com/u/8420490?v=3&s=150">
+        </br>
+        <a href="https://github.com/d3viant0ne">Joshua Wiens</a>
+      </td>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars3.githubusercontent.com/u/533616?v=3&s=150">
+        </br>
+        <a href="https://github.com/SpaceK33z">Kees Kluskens</a>
+      </td>
+      <td align="center">
+        <img width="150" height="150"
+        src="https://avatars3.githubusercontent.com/u/3408176?v=3&s=150">
+        </br>
+        <a href="https://github.com/TheLarkInn">Sean Larkin</a>
+      </td>
+    </tr>
   <tbody>
 </table>
 
