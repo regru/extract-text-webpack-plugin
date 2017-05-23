@@ -3,6 +3,7 @@
 	Author Tobias Koppers @sokra
 */
 var fs = require('fs');
+var path = requre('path');
 var ConcatSource = require("webpack-sources").ConcatSource;
 var async = require("async");
 var ExtractedModule = require("./ExtractedModule");
