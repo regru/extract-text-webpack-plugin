@@ -70,7 +70,7 @@ function indexOf( list, module ) {
 }
 
 function isLBlock(block) {
-	return /l-\w+\.less/.test(block);
+	return /^l-\[w+-]\.less$/.test(block);
 }
 
 function getSortFunc(modules) {
@@ -80,14 +80,19 @@ function getSortFunc(modules) {
 			lftBasename = path.basename(a.getOriginalModule().userRequest),
 			rgtBasename = path.basename(b.getOriginalModule().userRequest),
 			isLftLBlock = isLBlock(lftBasename),
-			isRgtLBlock = isLBlock(rgtBasename);
+			isRgtLBlock = isLBlock(rgtBasename),
+			summ        = isLftLBlock + isRgtLBlock;
 
-		if ( isLftLBlock || isRgtLBlock ) {
-			return !isRgtLBlock;
+		if (summ < 2 && isLftLBlock) {
+			return 1;
+		}
+
+		if (summ < 2 && isRgtLBlock) {
+			return 0;
 		}
 
 		if ( !(~lftHandIndex && ~rgtHandIndex) ) {
-			return 1;
+			return !rgtHandIndex;
 		}
 
 		return lftHandIndex - rgtHandIndex;
