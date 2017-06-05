@@ -1,6 +1,6 @@
 {
   "name": "extract-text-webpack-plugin",
-  "version": "2.1.0-regru",
+  "version": "2.1.1-regru",
   "author": "Tobias Koppers @sokra",
   "description": "Extract text from bundle into a file.",
   "engines": {
