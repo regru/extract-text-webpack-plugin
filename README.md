@@ -13,13 +13,16 @@
       src="https://webpack.js.org/assets/icon-square-big.svg">
   </a>
   <h1>Extract Text Plugin</h1>
+  <p>Extract text from a bundle, or bundles, into a separate file.</p>
 </div>
 
 <h2 align="center">Install</h2>
 
 ```bash
-# for webpack 2
+# for webpack 3
 npm install --save-dev extract-text-webpack-plugin
+# for webpack 2
+npm install --save-dev extract-text-webpack-plugin@2.1.2
 # for webpack 1
 npm install --save-dev extract-text-webpack-plugin@1.0.1
 ```
@@ -76,6 +79,10 @@ new ExtractTextPlugin(options: filename | object)
 * `[name]` name of the chunk
 * `[id]` number of the chunk
 * `[contenthash]` hash of the content of the extracted file
+* `[<hashType>:contenthash:<digestType>:<length>]` optionally you can configure
+  * other `hashType`s, e.g. `sha1`, `md5`, `sha256`, `sha512`
+  * other `digestType`s, e.g. `hex`, `base26`, `base32`, `base36`, `base49`, `base52`, `base58`, `base62`, `base64`
+  * and `length`, the length of the hash in chars
 
 > :warning: `ExtractTextPlugin` generates a file **per entry**, so you must use `[name]`, `[id]` or `[contenthash]` when using multiple entries.
 
@@ -139,7 +146,6 @@ module.exports = {
         test: /\.scss$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          //resolve-url-loader may be chained before sass-loader if necessary
           use: ['css-loader', 'sass-loader']
         })
       }
@@ -152,6 +158,45 @@ module.exports = {
     //  filename: 'style.css'
     //})
   ]
+}
+```
+
+### `url()` Resolving
+
+If you are finding that urls are not resolving properly when you run webpack. You can expand your loader functionality with options. The `url: false` property allows your paths resolved without any changes.
+
+```js
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+                loader: 'css-loader',
+                options: {
+                    // If you are having trouble with urls not resolving add this setting.
+                    // See https://github.com/webpack-contrib/css-loader#url
+                    url: false,
+                    minimize: true,
+                    sourceMap: true
+                }
+            }, 
+            {
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true
+                }
+            }
+          ]
+        })
+      }
+    ]
+  }
 }
 ```
 
