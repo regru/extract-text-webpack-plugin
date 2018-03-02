@@ -12,9 +12,9 @@
   "scripts": {
     "start": "npm run build -- -w",
     "appveyor:test": "npm run test",
-    "build": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js'",
+    "build": "node_modules/.bin/cross-env NODE_ENV=production node_modules/.bin/babel src -d dist --ignore 'src/**/*.test.js'",
     "build:example": "(cd example && webpack)",
-    "clean": "del-cli dist",
+    "clean": "node_modules/.bin/del-cli dist",
     "lint": "eslint --cache src test",
     "lint-staged": "lint-staged",
     "prebuild": "npm run clean",
@@ -27,8 +27,7 @@
     "travis:lint": "npm run lint && npm run security",
     "travis:test": "npm run test -- --runInBand",
     "travis:coverage": "npm run test:coverage -- --runInBand",
-    "webpack-defaults": "webpack-defaults",
-    "install": "node_modules/.bin/cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js'"
+    "webpack-defaults": "webpack-defaults"
   },
   "dependencies": {
     "async": "^2.4.1",
@@ -70,7 +69,10 @@
     "type": "git",
     "url": "http://github.com/webpack-contrib/extract-text-webpack-plugin.git"
   },
-  "pre-commit": "lint-staged",
+  "pre-commit": [
+    "lint-staged",
+    "build"
+  ],
   "lint-staged": {
     "*.js": [
       "eslint --fix",
