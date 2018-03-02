@@ -28,7 +28,7 @@
     "travis:test": "npm run test -- --runInBand",
     "travis:coverage": "npm run test:coverage -- --runInBand",
     "webpack-defaults": "webpack-defaults",
-    "install": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js'"
+    "install": "node_modules/.bin/cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js'"
   },
   "dependencies": {
     "async": "^2.4.1",
