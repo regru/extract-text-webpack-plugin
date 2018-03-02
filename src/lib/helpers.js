@@ -57,11 +57,11 @@ export function isType(type, obj) {
   return Object.prototype.toString.call(obj) === `[object ${type}]`;
 }
 
-function indexOf( list, module ) {
-  let i = 0,
-    findIndex = -1;
-  while ( list[ i ] ) {
-    if (list[ i ].userRequest === module.getOriginalModule().userRequest) {
+function indexOf(list, module) {
+  let i = 0;
+  let findIndex = -1;
+  while (list[i]) {
+    if (list[i].userRequest === module.getOriginalModule().userRequest) {
       findIndex = i;
       break;
     }
@@ -75,14 +75,14 @@ function isLBlock(block) {
 }
 
 export function getSortFunc(modules) {
-  return function(a, b) {
+  return function (a, b) {
     const lftHandIndex = indexOf(modules, a);
     const rgtHandIndex = indexOf(modules, b);
     const lftBasename = path.basename(a.getOriginalModule().userRequest);
     const rgtBasename = path.basename(b.getOriginalModule().userRequest);
     const isLftLBlock = isLBlock(lftBasename);
     const isRgtLBlock = isLBlock(rgtBasename);
-    const summ        = isLftLBlock + isRgtLBlock;
+    const summ = isLftLBlock + isRgtLBlock;
 
     if (summ < 2 && isLftLBlock) {
       return 1;
@@ -92,10 +92,10 @@ export function getSortFunc(modules) {
       return 0;
     }
 
-    if ( !(~lftHandIndex && ~rgtHandIndex) ) {
+    if (!(~lftHandIndex && ~rgtHandIndex)) {
       return !rgtHandIndex;
     }
 
     return lftHandIndex - rgtHandIndex;
-  }
+  };
 }

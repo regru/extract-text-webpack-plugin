@@ -198,7 +198,7 @@ class ExtractTextPlugin {
       compilation.plugin('additional-assets', (callback) => {
         extractedChunks.forEach((extractedChunk) => {
           if (extractedChunk.getNumberOfModules()) {
-            let sortFunc = getSortFunc(extractedChunk.originalModules);
+            const sortFunc = getSortFunc(extractedChunk.originalModules);
             extractedChunk.sortModules((a, b) => {
               if (!options.ignoreOrder && isInvalidOrder(a, b)) {
                 compilation.errors.push(new OrderUndefinedError(a.getOriginalModule()));
