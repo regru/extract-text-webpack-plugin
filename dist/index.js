@@ -18,9 +18,9 @@ var _Chunk2 = _interopRequireDefault(_Chunk);
 
 var _webpackSources = require('webpack-sources');
 
-var _async = require('async');
+var _neoAsync = require('neo-async');
 
-var _async2 = _interopRequireDefault(_async);
+var _neoAsync2 = _interopRequireDefault(_neoAsync);
 
 var _loaderUtils = require('loader-utils');
 
@@ -165,12 +165,12 @@ class ExtractTextPlugin {
             extractedChunk.addParent(extractedChunks[chunks.indexOf(c)]);
           });
         });
-        _async2.default.forEach(chunks, (chunk, callback) => {
+        _neoAsync2.default.forEach(chunks, (chunk, callback) => {
           // eslint-disable-line no-shadow
           const extractedChunk = extractedChunks[chunks.indexOf(chunk)];
-          const shouldExtract = !!(options.allChunks || (0, _helpers.isInitialOrHasNoParents)(chunk));
+          const shouldExtract = !!options.allChunks;
           chunk.sortModules();
-          _async2.default.forEach(chunk.mapModules(c => c), (module, callback) => {
+          _neoAsync2.default.forEach(chunk.mapModules(c => c), (module, callback) => {
             // eslint-disable-line no-shadow
             let meta = module[NS];
             if (meta && (!meta.options.id || meta.options.id === id)) {
@@ -178,8 +178,16 @@ class ExtractTextPlugin {
               // A stricter `shouldExtract !== wasExtracted` check to guard against cases where a previously extracted
               // module would be extracted twice. Happens when a module is a dependency of an initial and a non-initial
               // chunk. See issue #604
-              if (shouldExtract && !wasExtracted) {
-                module[`${NS}/extract`] = shouldExtract; // eslint-disable-line no-path-concat
+
+              // check every module's chunks.parents() to decide extract or not
+              for (let i = 0; i < module.chunks.length; i++) {
+                if (!(0, _helpers.isInitialOrHasNoParents)(module.chunks[i]) && !module.extracted) {
+                  module.extracted = true;
+                  break;
+                }
+              }
+              if (shouldExtract || !module.extracted && !wasExtracted) {
+                module[`${NS}/extract`] = true; // eslint-disable-line no-path-concat
                 compilation.rebuildModule(module, err => {
                   if (err) {
                     compilation.errors.push(err);
